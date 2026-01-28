@@ -227,6 +227,8 @@ audioFiles.forEach(filename => {
 		animationId = requestAnimationFrame(updateProgress);
 	}
 
+	node.startProgress = updateProgress;
+
 	let holdTimeout = null;
 	let isHolding = false;
 
@@ -324,8 +326,11 @@ function updateURL() {
 	const params = new URLSearchParams();
 	if (search.value) params.set('q', search.value);
 	if (loopEnabled) params.set('loop', '1');
-	const playingClip = document.querySelector('.audio-clip.playing');
-	if (playingClip) params.set('play', playingClip.dataset.clipId);
+	const playingClips = document.querySelectorAll('.audio-clip.playing');
+	if (playingClips.length > 0) {
+		const ids = Array.from(playingClips).map(c => c.dataset.clipId).join(',');
+		params.set('play', ids);
+	}
 
 	const newURL = params.toString()
 		? `${window.location.pathname}?${params}`
@@ -459,6 +464,7 @@ tags.forEach(tag => {
 			tag.classList.add('active');
 		}
 		filterClips();
+		updateURL();
 		search.focus();
 	});
 });
@@ -470,6 +476,12 @@ const qParam = params.get('q');
 if (qParam) {
 	search.value = qParam;
 	filterClips();
+	// Activate matching tag if exists
+	tags.forEach(tag => {
+		if (tag.dataset.query === qParam) {
+			tag.classList.add('active');
+		}
+	});
 }
 
 const loopParam = params.get('loop');
@@ -480,27 +492,40 @@ if (loopParam === '1') {
 
 const playParam = params.get('play');
 if (playParam) {
+	const clipIds = playParam.split(',');
 	const clips = document.querySelectorAll('.audio-clip');
-	const target = Array.from(clips).find(clip => {
-		const clipId = clip.dataset.clipId.toLowerCase();
-		return clipId === playParam.toLowerCase() || clipId.includes(playParam.toLowerCase());
-	});
-	if (target) {
-		target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-		target.classList.add('pending');
+	const targets = [];
 
-		// Try to autoplay, but browsers may block it
-		const audio = target.querySelector('audio');
-		audioCtx.resume().then(() => {
-			audio.loop = loopEnabled;
-			audio.play().then(() => {
-				target.classList.remove('pending');
-				target.classList.add('playing');
-				updateURL();
-			}).catch(() => {
-				// Autoplay blocked - show prompt
-				showToast('Click the clip to play');
+	clipIds.forEach(id => {
+		const target = Array.from(clips).find(clip => {
+			const clipId = clip.dataset.clipId.toLowerCase();
+			return clipId === id.toLowerCase() || clipId.includes(id.toLowerCase());
+		});
+		if (target) targets.push(target);
+	});
+
+	if (targets.length > 0) {
+		targets[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+		let autoplayBlocked = false;
+		targets.forEach(target => {
+			target.classList.add('pending');
+			const audio = target.querySelector('audio');
+			audioCtx.resume().then(() => {
+				audio.loop = loopEnabled;
+				audio.play().then(() => {
+					target.classList.remove('pending');
+					target.classList.add('playing');
+					target.startProgress();
+					updateURL();
+				}).catch(() => {
+					autoplayBlocked = true;
+				});
 			});
 		});
+
+		setTimeout(() => {
+			if (autoplayBlocked) showToast('Click the clips to play');
+		}, 100);
 	}
 }
