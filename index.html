@@ -11,17 +11,47 @@
 
 	<h1>Squeex Soundboard</h1>
 
-	<input type='search' placeholder='Search' autofocus>
+	<input type='search' placeholder='Search sounds...' autofocus>
 
-	<div id='list-container'>
-		<div hidden id='template' class='audio-clip'>
-			<div class='label'></div>
-			<audio controls>
-				<source src="" type="">
-			</audio>
-		</div>
+	<button id='loop-toggle' title='Loop clips'>
+		<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+			<path d="M17 2l4 4-4 4"/><path d="M3 11v-1a4 4 0 014-4h14"/>
+			<path d="M7 22l-4-4 4-4"/><path d="M21 13v1a4 4 0 01-4 4H3"/>
+		</svg>
+	</button>
+
+	<div id='tags'>
+		<button class='tag' data-query='bazinga'>bazinga</button>
+		<button class='tag' data-query='cum'>cum</button>
+		<button class='tag' data-query='fuck'>fuck</button>
+		<button class='tag' data-query='minecraft'>minecraft</button>
+		<button class='tag' data-query='more at 7'>more at 7</button>
+		<button class='tag' data-query='obama'>obama</button>
+		<button class='tag' data-query='pirate'>pirate</button>
+		<button class='tag' data-query='seinfeld'>seinfeld</button>
+		<button class='tag' data-query='star wars'>star wars</button>
+		<button class='tag' data-query='walkin'>walkin</button>
+		<button class='tag' data-query='gary'>well gary</button>
+		<button class='tag' data-query='yoshi'>yoshi</button>
 	</div>
 
+	<div id='list-container'></div>
+
+	<template id='template'>
+		<button class='audio-clip'>
+			<span class='label'></span>
+			<audio preload='none'>
+				<source src="" type="">
+			</audio>
+		</button>
+	</template>
+
+	<div id='context-menu' hidden>
+		<button data-action='copy'>Copy link</button>
+		<button data-action='play'>Play</button>
+		<button data-action='play2x'>Play 2x</button>
+		<button data-action='stop'>Stop</button>
+	</div>
 
 </body>
 </html>
