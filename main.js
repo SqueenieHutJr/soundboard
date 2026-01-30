@@ -105,6 +105,7 @@ const audioFiles = [
 	"walkin (3).mp3",
 	"Wanna go for a ride jump on my hog.mp3",
 	"watch me cum.mp3",
+	"welcome-2-the-kitty-litter.mp3",
 	"well gary (1).mp3",
 	"well gary (2).mp3",
 	"well gary (3).mp3",
